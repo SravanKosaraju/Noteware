@@ -3,12 +3,20 @@ import { useContext } from 'react'
 import Notecontext from '../context/notes/NoteContext'
 import NoteItem from './NoteItem'
 import AddNote from './AddNote'
+import { useNavigate } from 'react-router-dom'
 
-function Notes() {
+function Notes(props) {
+    const {showalert}=props
+    let Navigate=useNavigate()
     const context = useContext(Notecontext)
     const { notes, getNotes,EditNote } = context
     useEffect(() => {
-        getNotes();
+        if(localStorage.getItem('token')){
+            getNotes();
+        }
+        else{
+            Navigate("/login")
+        }
         // eslint-disable-next-line
     }, [])
 
@@ -22,6 +30,7 @@ function Notes() {
         e.preventDefault()
         EditNote(note.id,note.etitle,note.edescription,note.etag)
         refclose.current.click()
+        showalert("Updated Successfully","success")
     }
 
     const ref = useRef(0)
@@ -34,7 +43,7 @@ function Notes() {
 
     return (
         <>
-            <AddNote />
+            <AddNote showalert={showalert}/>
             <button ref={ref} type="button" className="btn btn-primary d-none" data-toggle="modal" data-target="#exampleModal">
                 Launch demo modal
             </button>
@@ -77,7 +86,7 @@ function Notes() {
                 {notes.length===0 && "No Notes to Display"}
                 </div>
                 {notes?.map((note) => {
-                    return <NoteItem key={note._id} updateNote={updateNote} note={note} />
+                    return <NoteItem showalert={showalert} key={note._id} updateNote={updateNote} note={note} />
                 })}
             </div>
         </>
